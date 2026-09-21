@@ -1,10 +1,13 @@
 pipeline {
     agent any
+
     environment {
         IMAGE = "aravindhmanogar/k8s-flask-app"
         TAG = "${env.GIT_COMMIT.take(7)}"
     }
+
     stages {
+
         stage('Test') {
             steps {
                 sh '''
@@ -17,6 +20,7 @@ pipeline {
                 '''
             }
         }
+
         stage('Build & Push') {
             steps {
                 script {
@@ -28,13 +32,27 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                    kubectl set image deployment/flask-app \
+                    flask-app=${IMAGE}:${TAG}
+
+                    kubectl rollout status deployment/flask-app
+                '''
+            }
+        }
     }
+
     post {
         success {
-            echo 'Pipeline succeeded - image pushed to Docker Hub'
+            echo 'Pipeline succeeded - image pushed and deployed to Kubernetes'
         }
+
         failure {
             echo 'Pipeline failed'
         }
     }
 }
+
