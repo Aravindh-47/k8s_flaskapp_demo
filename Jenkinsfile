@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        IMAGE = "yourdockerhubusername/k8s-flask-app"
+        IMAGE = "aravindhmanogar/k8s-flask-app"
         TAG = "${env.GIT_COMMIT.take(7)}"
     }
     stages {
